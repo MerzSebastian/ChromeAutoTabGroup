@@ -1,0 +1,26 @@
+{
+  "name": "AutoTabGroup",
+  "version": "1.0",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+      "tabs",
+      "tabGroups",
+      "contextMenus",
+      "storage"
+  ],
+  "icons": {
+    "16": "icons/white/16.ico",
+    "24": "icons/white/24.ico",
+    "32": "icons/white/32.ico",
+    "48": "icons/white/48.ico",
+    "64": "icons/white/64.ico",
+    "72": "icons/white/72.ico",
+    "80": "icons/white/80.ico",
+    "96": "icons/white/96.ico",
+    "128": "icons/white/128.ico"
+  },
+  "action": {}
+}
