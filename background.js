@@ -1,13 +1,13 @@
-let collapseOnClick = false;
-chrome.storage.sync.get(["collapseOnClick", "toggleIcon"], function(items){
-  console.log(items);
+let collapseOnClick;
+chrome.storage.sync.get(["collapseOnClick", "darkmode"], function (items) {
+  collapseOnClick = items["collapseOnClick"] ? items["collapseOnClick"] : true;
+  let darkmode = items["darkmode"] ? items["darkmode"] : true;
   const MenuOptions = [
-    {id: 0, title: 'Collapse on click', status: items["collapseOnClick"] ? items["collapseOnClick"] : true},
-    {id: 1, title: 'Icon darkmode', status: items["toggleIcon"] ? items["toggleIcon"] : true},
+    { id: 0, title: 'Collapse on click', status: collapseOnClick },
+    { id: 1, title: 'Icon darkmode', status: darkmode },
   ];
-  collapseOnClick = MenuOptions[0].status;
-  
-  MenuOptions.forEach((option)=>{
+
+  MenuOptions.forEach((option) => {
     chrome.contextMenus.create({
       id: option.id.toString(),
       title: option.title,
@@ -18,46 +18,50 @@ chrome.storage.sync.get(["collapseOnClick", "toggleIcon"], function(items){
   })
 });
 
+setAndSaveColor(true);
+function setAndSaveColor(darkmode) {
+  path = {
+    "16": "icons/white/16.ico",
+    "24": "icons/white/24.ico",
+    "32": "icons/white/32.ico",
+    "48": "icons/white/48.ico",
+    "64": "icons/white/64.ico",
+    "72": "icons/white/72.ico",
+    "80": "icons/white/80.ico",
+    "96": "icons/white/96.ico",
+    "128": "icons/white/128.ico"
+  };
+  !darkmode && (path = {
+    "16": "icons/black/16.ico",
+    "24": "icons/black/24.ico",
+    "32": "icons/black/32.ico",
+    "48": "icons/black/48.ico",
+    "64": "icons/black/64.ico",
+    "72": "icons/black/72.ico",
+    "80": "icons/black/80.ico",
+    "96": "icons/black/96.ico",
+    "128": "icons/black/128.ico"
+  });
+  chrome.action.setIcon({ path: path });
+  chrome.storage.sync.set({ "darkmode": darkmode }, function () { });
+}
+
+
+chrome.contextMenus.onClicked.addListener(contextClick);
 function contextClick(info, tab) {
+  console.log(info, tab);
   switch (info.menuItemId) {
     case "0":
       collapseOnClick = info.checked;
-      chrome.storage.sync.set({ "collapseOnClick": info.checked }, function() { });
+      chrome.storage.sync.set({ "collapseOnClick": info.checked }, function () { });
       break;
     case "1":
-      chrome.action.setIcon(
-        info.checked ? 
-        { path: {
-          "16": "icons/white/16.ico",
-          "24": "icons/white/24.ico",
-          "32": "icons/white/32.ico",
-          "48": "icons/white/48.ico",
-          "64": "icons/white/64.ico",
-          "72": "icons/white/72.ico",
-          "80": "icons/white/80.ico",
-          "96": "icons/white/96.ico",
-          "128": "icons/white/128.ico"
-        } }: 
-        { path: {
-          "16": "icons/black/16.ico",
-          "24": "icons/black/24.ico",
-          "32": "icons/black/32.ico",
-          "48": "icons/black/48.ico",
-          "64": "icons/black/64.ico",
-          "72": "icons/black/72.ico",
-          "80": "icons/black/80.ico",
-          "96": "icons/black/96.ico",
-          "128": "icons/black/128.ico"
-        } }
-      );
-      chrome.storage.sync.set({ "toggleIcon": info.checked }, function() { });
+      setAndSaveColor(info.checked);
       break;
-  
     default:
       break;
   }
 }
-chrome.contextMenus.onClicked.addListener(contextClick)
 
 
 chrome.action.onClicked.addListener(async (tab) => {
@@ -79,9 +83,9 @@ chrome.action.onClicked.addListener(async (tab) => {
           newTabName = newTabName ? newTabName[1] : element.url; //fallback if name cannot be resolved
           tabExists(newTabName)
             ? groups.forEach((currElement, index) => {
-                currElement.name === newTabName &&
-                  groups[index].values.push(element.id);
-              })
+              currElement.name === newTabName &&
+                groups[index].values.push(element.id);
+            })
             : groups.push({ name: newTabName, values: [element.id] });
         });
 
@@ -100,13 +104,13 @@ chrome.action.onClicked.addListener(async (tab) => {
                 }
                 var collapsed = group.values.includes(currentActiveTab[0].id) ? false : true;
                 chrome.tabGroups.update(groupId, {
-                  ...(collapseOnClick ? {collapsed: collapsed} : {}),
+                  ...(collapseOnClick ? { collapsed: collapsed } : {}),
                   title: group.name,
                 });
 
                 //BUGFIX
                 await new Promise(resolve => setTimeout(resolve, 300));
-                chrome.tabGroups.update(groupId, {...(collapseOnClick ? {collapsed: collapsed} : {})});
+                chrome.tabGroups.update(groupId, { ...(collapseOnClick ? { collapsed: collapsed } : {}) });
                 //BUGFIX
               }
             );
