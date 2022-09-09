@@ -20,28 +20,18 @@ chrome.storage.sync.get(["collapseOnClick", "darkmode"], function (items) {
 
 setAndSaveColor(true);
 function setAndSaveColor(darkmode) {
+  let color = darkmode ? "white" : "black";
   path = {
-    "16": "icons/white/16.ico",
-    "24": "icons/white/24.ico",
-    "32": "icons/white/32.ico",
-    "48": "icons/white/48.ico",
-    "64": "icons/white/64.ico",
-    "72": "icons/white/72.ico",
-    "80": "icons/white/80.ico",
-    "96": "icons/white/96.ico",
-    "128": "icons/white/128.ico"
+    "16": "icons/" + color + "/16.ico",
+    "24": "icons/" + color + "/24.ico",
+    "32": "icons/" + color + "/32.ico",
+    "48": "icons/" + color + "/48.ico",
+    "64": "icons/" + color + "/64.ico",
+    "72": "icons/" + color + "/72.ico",
+    "80": "icons/" + color + "/80.ico",
+    "96": "icons/" + color + "/96.ico",
+    "128": "icons/" + color + "/128.ico"
   };
-  !darkmode && (path = {
-    "16": "icons/black/16.ico",
-    "24": "icons/black/24.ico",
-    "32": "icons/black/32.ico",
-    "48": "icons/black/48.ico",
-    "64": "icons/black/64.ico",
-    "72": "icons/black/72.ico",
-    "80": "icons/black/80.ico",
-    "96": "icons/black/96.ico",
-    "128": "icons/black/128.ico"
-  });
   chrome.action.setIcon({ path: path });
   chrome.storage.sync.set({ "darkmode": darkmode }, function () { });
 }
