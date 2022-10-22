@@ -6,8 +6,27 @@ jobs:
       - image: ubuntu:latest
     steps:
       - checkout
-      - run: |
-          grep -oP 'version": "\K[0-9]*.[0-9]*.[0-9]*' AutoTabGroup/manifest.json
+      - run:
+          name: install github cli & zip
+          command: |
+            apt update
+            apt install curl -y
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+            && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+            && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+            && apt update \
+            && apt install gh -y \
+            && apt install zip -y
+      - run: 
+          name: create release
+          command: | 
+            grep -oP 'version": "\K[0-9]*.[0-9]*.[0-9]*' AutoTabGroup/manifest.json
+      - run:
+          name: zip it and ship it
+          command: |
+            export NEW_VERSION=$(grep -oP 'version": "\K[0-9]*.[0-9]*.[0-9]*' AutoTabGroup/manifest.json)
+            cd AutoTabGroup && zip -r AutoTabGroup.zip *
+            gh release create ${NEW_VERSION} AutoTabGroup.zip
 
 workflows:
   publish:
