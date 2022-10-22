@@ -36,3 +36,6 @@ workflows:
   publish:
     jobs:
       - publish
+          filters:
+            branches:
+              only: main
