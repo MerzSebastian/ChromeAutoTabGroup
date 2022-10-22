@@ -1,6 +1,6 @@
 {
   "name": "AutoTabGroup",
-  "version": "1.0.0",
+  "version": "1.0.10",
   "manifest_version": 3,
   "background": {
     "service_worker": "background.js"
