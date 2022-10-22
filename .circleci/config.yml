@@ -1,0 +1,14 @@
+version: 2.1
+
+jobs:
+  publish:
+    docker:
+      - image: ubuntu:latest
+    steps:
+      - checkout
+      - run: grep -oP 'version":\s"(.*)",' AutoTabGroup/manifest.json
+
+workflows:
+  publish:
+    jobs:
+      - publish
