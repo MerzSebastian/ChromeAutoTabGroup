@@ -1,0 +1,41 @@
+version: 2.1
+
+jobs:
+  publish:
+    docker:
+      - image: ubuntu:latest
+    steps:
+      - checkout
+      - run:
+          name: install github cli & zip
+          command: |
+            apt update
+            apt install curl -y
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+            && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+            && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+            && apt update \
+            && apt install gh -y \
+            && apt install zip -y
+      - run: 
+          name: create release
+          command: | 
+            grep -oP 'version": "\K[0-9]*.[0-9]*.[0-9]*' AutoTabGroup/manifest.json
+      - run:
+          name: zip it and ship it
+          command: |
+            export NEW_VERSION=$(grep -oP 'version": "\K[0-9]*.[0-9]*.[0-9]*' AutoTabGroup/manifest.json)
+            if [[ $(curl -s -w "%{http_code}" https://github.com/MerzSebastian/ChromeAutoTabGroup/releases/tag/${NEW_VERSION}) = "Not Found404" ]]
+            then
+              cd AutoTabGroup && zip -r AutoTabGroup.zip *
+              gh release create ${NEW_VERSION} AutoTabGroup.zip --notes ""
+            fi
+            
+
+workflows:
+  publish:
+    jobs:
+      - publish:
+          filters:
+            branches:
+              only: main
