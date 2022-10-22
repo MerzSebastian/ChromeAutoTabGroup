@@ -1,6 +1,6 @@
 {
   "name": "AutoTabGroup",
-  "version": "1.0",
+  "version": "1.0.0",
   "manifest_version": 3,
   "background": {
     "service_worker": "background.js"
@@ -12,15 +12,15 @@
       "storage"
   ],
   "icons": {
-    "16": "icons/white/16.ico",
-    "24": "icons/white/24.ico",
-    "32": "icons/white/32.ico",
-    "48": "icons/white/48.ico",
-    "64": "icons/white/64.ico",
-    "72": "icons/white/72.ico",
-    "80": "icons/white/80.ico",
-    "96": "icons/white/96.ico",
-    "128": "icons/white/128.ico"
+    "16": "icons/black/16.png",
+    "24": "icons/black/24.png",
+    "32": "icons/black/32.png",
+    "48": "icons/black/48.png",
+    "64": "icons/black/64.png",
+    "72": "icons/black/72.png",
+    "80": "icons/black/80.png",
+    "96": "icons/black/96.png",
+    "128": "icons/black/128.png"
   },
   "action": {}
 }
