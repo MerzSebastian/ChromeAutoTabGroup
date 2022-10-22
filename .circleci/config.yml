@@ -35,7 +35,7 @@ jobs:
 workflows:
   publish:
     jobs:
-      - publish
+      - publish:
           filters:
             branches:
               only: main
