@@ -1,4 +1,6 @@
+
 let collapseOnClick;
+let addSinglePagesToGroup;
 
 const setDarkmode = (darkmode = true) => {
   path = {
@@ -19,6 +21,7 @@ const createMenu = (darkmode, collapseOnClick) => {
   const MenuOptions = [
     { id: 0, title: 'Collapse on click', status: collapseOnClick },
     { id: 1, title: 'Darkmode', status: darkmode },
+    { id: 2, title: 'Add single pages to group', status: addSinglePagesToGroup },
   ];
   MenuOptions.forEach((option) => {
     try {
@@ -43,19 +46,25 @@ const handleMenu = (info, tab) => {
       collapseOnClick = info.checked;
       chrome.storage.sync.set({ "collapseOnClick": info.checked });
       break;
-    case "1":
-      setDarkmode(info.checked);
-      chrome.storage.sync.set({ "darkmode": info.checked });
-      break;
+      case "1":
+        setDarkmode(info.checked);
+        chrome.storage.sync.set({ "darkmode": info.checked });
+        break;
+      case "2":
+        addSinglePagesToGroup = info.checked;
+        chrome.storage.sync.set({ "addSinglePagesToGroup": info.checked });
+        break;
     default:
       break;
   }
 };
 
 chrome.storage.sync.get(["collapseOnClick", "darkmode"], function (items) {
-  darkmode = items.darkmode ? items.darkmode : false;
+  const darkmode = items.darkmode ? items.darkmode : false;
+  addSinglePagesToGroup = items.addSinglePagesToGroup ? items.addSinglePagesToGroup : true;
   darkmode && setDarkmode();
-  createMenu(darkmode, items.collapseOnClick ? items.collapseOnClick : true);
+  collapseOnClick = items.collapseOnClick ? items.collapseOnClick : true;
+  createMenu(darkmode, collapseOnClick);
 });
 
 chrome.action.onClicked.addListener(async (tab) => {
@@ -84,10 +93,24 @@ chrome.action.onClicked.addListener(async (tab) => {
       }
     });
 
-    groupsToCreate.filter((el) => el.tabIds.length > 1).forEach(async (group) => {
-      const groupId = await chrome.tabs.group({ tabIds: group.tabIds });
-      chrome.tabGroups.update(groupId, { title: group.title, collapsed: group.hasActiveTab ? false : collapseOnClick });
+    // .filter((el) => el.tabIds.length > 1)
+    singlePageGroupIds = {hasActiveTab: false, groupids:[]};
+    groupsToCreate.forEach(async (group) => {
+      if (group.tabIds.length > 1) {
+        const groupId = await chrome.tabs.group({ tabIds: group.tabIds });
+        chrome.tabGroups.update(groupId, { title: group.title, collapsed: group.hasActiveTab ? false : collapseOnClick });
+      }
+      if (group.tabIds.length === 1) {
+        singlePageGroupIds.hasActiveTab = group.hasActiveTab ? true : singlePageGroupIds.hasActiveTab;
+        singlePageGroupIds.groupids.push(group.tabIds[0]);
+      }
     });
+    if (addSinglePagesToGroup) {
+      const groupId = await chrome.tabs.group({ tabIds: singlePageGroupIds.groupids });
+      chrome.tabGroups.update(groupId, { title: "everything else", collapsed: singlePageGroupIds.hasActiveTab ? false : collapseOnClick, color: "green" });
+    }
+
+    
   });
 });
 
