@@ -25,10 +25,11 @@ jobs:
           name: zip it and ship it
           command: |
             export NEW_VERSION=$(grep -oP 'version": "\K[0-9]*.[0-9]*.[0-9]*' AutoTabGroup/manifest.json)
+            export NOTES=$(grep -zP '(## \[1.1.0\])([\S\s]*?)(?=## \[)' CHANGELOG.md)
             if [[ $(curl -s -w "%{http_code}" https://github.com/MerzSebastian/ChromeAutoTabGroup/releases/tag/${NEW_VERSION}) = "Not Found404" ]]
             then
               cd AutoTabGroup && zip -r AutoTabGroup.zip *
-              gh release create ${NEW_VERSION} AutoTabGroup.zip --notes ""
+              gh release create ${NEW_VERSION} AutoTabGroup.zip --notes "${NOTES}"
             fi
             
 
