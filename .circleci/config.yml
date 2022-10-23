@@ -29,7 +29,7 @@ jobs:
             then
               export NOTES=$(grep -ozP '(## \['${NEW_VERSION}'\])([\S\s]*?)(?=## \[)' CHANGELOG.md)
               cd AutoTabGroup && zip -r AutoTabGroup.zip *
-              gh release create ${NEW_VERSION} AutoTabGroup.zip --notes '${NOTES}'
+              gh release create ${NEW_VERSION} AutoTabGroup.zip --notes ${NOTES}
             fi
             
 
