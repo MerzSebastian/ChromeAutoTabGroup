@@ -1,3 +1,11 @@
+// Known Bugs:
+// - UI icons sometimes being stuck after collapsing.
+// - collapse on click only works initially, does not detect if tab is active if you click it again. collapses everything after second click (sometimes)
+// - darkmode icon not changing on initial chrome startup. works after first click on icon, also no action on first click on icon somehow
+// Wanted features:
+// - custom tab-names/regex patterns
+// - 
+
 
 let collapseOnClick;
 let addSinglePagesToGroup;
